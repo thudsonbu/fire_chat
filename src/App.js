@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import './App.css';
 
 import firebase from 'firebase/app';
@@ -30,7 +30,6 @@ function App() {
     <div className="App">
       <section className="App-main">
         {user ? <ChatRoom /> : <SignIn />}
-        <SignOut/>
       </section>
     </div>
   );
@@ -59,14 +58,25 @@ function ChatRoom() {
   const [messages] = useCollectionData(query, {idField: 'id'});
   const [formValue, setFormValue] = useState('');
 
+  const sendMessage = async(e) => {
+    e.preventDefault();
+    const {uid, photoURL } = auth.currentUser;
+    await messagesRef.add({
+      text: formValue,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      uid,
+      photoURL
+    });
+    setFormValue('');
+  }
+
 
   return (
     <div>
       <div>
-        <h1>Chat Messages</h1>
         {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg}/> )}
       </div>
-      <form>
+      <form onSubmit={sendMessage}>
         <input value={formValue} onChange={(e) => setFormValue(e.target.value)} />
         <button type="submit">send</button>
       </form>
@@ -77,9 +87,9 @@ function ChatRoom() {
 // {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg}/> )}
 
 function ChatMessage(props) {
-  const { text, uid } = props.message;
+  const { text, uid, photoURL } = props.message;
 
-  const messageClass = uid === auth.currentUser.uid ? 'sent' : 'received';
+  const messageClass = uid == auth.currentUser.uid ? 'sent' : 'received';
 
   return (
     <div className={'message ${messageClass}'}>
