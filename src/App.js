@@ -92,7 +92,6 @@ function ChatRoom() {
     
   )
 }
-// {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg}/> )}
 
 function ChatMessage(props) {
   const { text, uid, photoURL } = props.message;
