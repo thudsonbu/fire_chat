@@ -28,11 +28,9 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
-        
-      </header>
       <section className="App-main">
         {user ? <ChatRoom /> : <SignIn />}
+        <SignOut/>
       </section>
     </div>
   );
@@ -59,20 +57,36 @@ function ChatRoom() {
   const query = messagesRef.orderBy('createdAt').limit(25);
 
   const [messages] = useCollectionData(query, {idField: 'id'});
+  const [formValue, setFormValue] = useState('');
+
 
   return (
     <div>
       <div>
+        <h1>Chat Messages</h1>
         {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg}/> )}
       </div>
+      <form>
+        <input value={formValue} onChange={(e) => setFormValue(e.target.value)} />
+        <button type="submit">send</button>
+      </form>
     </div>
+    
   )
 }
+// {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg}/> )}
 
 function ChatMessage(props) {
   const { text, uid } = props.message;
 
-  return <p>{text}</p>
+  const messageClass = uid === auth.currentUser.uid ? 'sent' : 'received';
+
+  return (
+    <div className={'message ${messageClass}'}>
+      <img src={photoURL}/>
+      <p>{text}</p>
+    </div>
+  ) 
 }
 
 
